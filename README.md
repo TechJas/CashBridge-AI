@@ -2,7 +2,7 @@
 
 CashBridge AI is an AI-assisted cash-flow copilot for small businesses. It helps owners see who owes them money, understand upcoming expenses, spot potential cash shortages, and prepare PayPal payment reminders that always require human approval.
 
-> **Status:** Phase 1 - project initialization. The repository currently contains documentation and environment templates only. No application code or dependencies have been added yet.
+> **Status:** Phase 3 - PayPal Sandbox invoice history. The FastAPI backend exposes `/health` and a read-only `/api/invoices` endpoint with Pydantic response contracts, a service layer, CORS, and automated pytest and Ruff checks. Supabase, AI providers, and the React frontend are not connected yet.
 
 ## The problem
 
@@ -35,18 +35,18 @@ CashBridge AI brings this information into one place, highlights cash-flow risks
 
 ## Architecture
 
-CashBridge AI is a monorepo with four main areas:
+CashBridge AI is a monorepo. Folders marked planned are part of the target layout but do not contain application code yet:
 
 ```text
 CashBridge-AI/
-├── backend/    FastAPI application, business logic, and integrations
-├── frontend/   React single-page application
-├── supabase/   Database migrations, policies, and demo seed data
-├── docs/       Setup guides, architecture notes, and decisions
-└── scripts/    Small developer convenience scripts
+├── backend/    FastAPI application, business logic, and integrations (implemented)
+├── frontend/   React single-page application (planned)
+├── supabase/   Database migrations, policies, and demo seed data (planned)
+├── docs/       Progress notes, setup guides, and decisions (implemented)
+└── scripts/    Small developer convenience scripts (planned)
 ```
 
-Planned technology:
+Technology:
 
 | Layer | Technology |
 |---|---|
@@ -55,7 +55,8 @@ Planned technology:
 | Database | Supabase Postgres with Row Level Security |
 | Payments | PayPal Sandbox (server-side only) |
 | AI | Provider adapter with a mock implementation first |
-| Tooling | uv, Ruff, pytest, ESLint, TypeScript |
+| Tooling (backend) | Ruff, pytest |
+| Tooling (frontend, planned) | ESLint, TypeScript |
 
 ### How a reminder is handled
 
@@ -78,35 +79,42 @@ All monetary values are stored and transferred as integer minor units (for examp
 
 | Path | Purpose |
 |---|---|
-| `backend/` | FastAPI routes, schemas, services, repositories, and external integrations. |
-| `frontend/` | React application organized by business feature. |
-| `supabase/` | Versioned SQL migrations, Row Level Security policies, and seed data. |
-| `docs/` | Setup instructions, architecture notes, API contract, and decision records. |
-| `scripts/` | Safe helper scripts for local development. |
-| `.github/` | Pull-request template and future CI checks. |
+| `backend/` | FastAPI routes, schemas, services, and external integrations (implemented). |
+| `frontend/` | React application organized by business feature (planned). |
+| `supabase/` | Versioned SQL migrations, Row Level Security policies, and seed data (planned). |
+| `docs/` | Progress notes, setup instructions, architecture notes, and decisions. |
+| `scripts/` | Safe helper scripts for local development (planned). |
+| `.github/` | Pull-request template and CI checks (planned). |
 | `AGENTS.md` | Rules for AI coding assistants and the team. |
 
 ## Local development
 
-Phase 1 does not install or run anything. The setup steps below are planned for Phase 2.
-
 ### Prerequisites
 
 - Git
-- Python and uv (versions will be pinned in Phase 2)
-- Node.js and npm (versions will be pinned in Phase 2)
-- A Supabase project
+- Python 3.11 or newer
 - PayPal Developer Sandbox credentials
 
-### Planned setup
+React and Supabase prerequisites will be added when those parts are scaffolded.
 
-1. Copy `.env.example` values into `backend/.env`.
-2. Create `frontend/.env.local` with the frontend values from `.env.example`.
-3. Install backend dependencies with uv and frontend dependencies with npm.
-4. Apply Supabase migrations.
-5. Start the FastAPI and Vite development servers.
+### Backend setup
 
-Exact commands and pinned versions will be documented in `docs/setup.md` once the application is scaffolded.
+1. Copy `.env.example` values into `backend/.env` and fill in the PayPal Sandbox credentials.
+2. Create a virtual environment at the repository root: `python -m venv .venv`.
+3. Install backend and developer dependencies: `.venv\Scripts\python.exe -m pip install -r backend/requirements-dev.txt`.
+4. Start the API from `backend`: `..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000`.
+
+### Verification commands
+
+Run these from `backend`:
+
+```text
+..\.venv\Scripts\python.exe -m ruff check .
+..\.venv\Scripts\python.exe -m ruff format --check .
+..\.venv\Scripts\python.exe -m pytest
+```
+
+The test suite mocks PayPal with `httpx.MockTransport`, so it needs no Sandbox credentials.
 
 ## Security and safety rules
 
@@ -142,20 +150,19 @@ Exact commands and pinned versions will be documented in `docs/setup.md` once th
 
 | Phase | Goal |
 |---|---|
-| 1 | Project initialization and repository guardrails (current) |
-| 2 | Scaffold FastAPI and React applications |
-| 3 | Design Supabase schema, policies, and seed data |
-| 4 | Implement cash-flow logic, PayPal Sandbox integration, and AI adapter |
-| 5 | Build the approval workflow, demo data, tests, and presentation |
+| 1 | Project initialization and repository guardrails |
+| 2 | Local environment and collaboration setup |
+| 3 | FastAPI backend and PayPal Sandbox invoice history (current) |
+| 4 | Supabase schema, cash-flow logic, and AI adapter |
+| 5 | Approval workflow, React frontend, demo data, and presentation |
 
 ## Documentation
 
-Planned documents:
-
-- `docs/setup.md` - local environment setup
-- `docs/architecture.md` - system design and data flow
-- `docs/api-contract.md` - endpoint and schema reference
-- `docs/decisions/` - short architecture decision records
+- `docs/PROJECT_PROGRESS.md` - completed work, verification results, and next steps
+- `docs/setup.md` - local environment setup (planned)
+- `docs/architecture.md` - system design and data flow (planned)
+- `docs/api-contract.md` - endpoint and schema reference (planned)
+- `docs/decisions/` - short architecture decision records (planned)
 
 ## License
 
