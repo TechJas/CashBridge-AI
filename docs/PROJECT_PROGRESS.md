@@ -1,7 +1,7 @@
 # CashBridge AI - Project Progress
 
 Last updated: 2026-10-28  
-Current phase: Phase 4 - Supabase schema and cash-flow foundation
+Current phase: Phase 4B - Supabase backend integration and cash-flow summary
 
 ## Phase 1 - Project initialization
 
@@ -142,8 +142,8 @@ PayPal's list response returns `items` and `links` only for this Sandbox account
 - [x] Made approval and send-attempt records append-only with database triggers.
 - [x] Added `supabase/migrations/20261028000200_enable_rls.sql`; RLS is enabled on every table and only the backend service role can access data.
 - [x] Added entirely fictional seed data in `supabase/seed.sql` for one business, three customers, six invoices, five expenses, and two reminders.
-- [ ] Apply both migrations and the seed to the team Supabase project through the SQL Editor.
-- [ ] Add the backend repository layer and deterministic cash-flow service.
+- [x] Applied both migrations and the seed to the team Supabase project through the SQL Editor.
+- [x] Verified the applied records: 1 business, 6 invoices, and 5 expenses.
 
 **Learning milestones**
 
@@ -160,10 +160,63 @@ PayPal's list response returns `items` and `links` only for this Sandbox account
 4. Run `supabase/seed.sql`.
 5. Confirm with `select count(*) from public.businesses;` (expected `1`) and `select count(*) from public.invoices;` (expected `6`).
 
+### Step 2 - Backend Supabase integration and deterministic cash flow
+
+- [x] Added the official `supabase` Python client to `backend/requirements.txt`.
+- [x] Read `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from backend environment variables only; no values are hardcoded or printed.
+- [x] Added `app/integrations/supabase.py` for backend-only service-role client creation.
+- [x] Added read-only repositories for businesses, invoices, and expenses under `app/db/repositories/`.
+- [x] Added typed database records and safe mapping errors in `app/db/models.py` and `app/db/repositories/base.py`.
+- [x] Added `app/services/cash_flow.py` with `Decimal` arithmetic and cumulative 30/60/90 day horizons.
+- [x] Distinguished collected cash, outstanding receivables, overdue receivables, planned expenses, and overdue expenses.
+- [x] Excluded unpaid invoices from collected cash and excluded draft invoices from receivables.
+- [x] Added local-only `GET /api/businesses` and `GET /api/cash-flow/summary` routes.
+- [x] Added 36 new tests with fictional data; the full suite now has 73 passing tests.
+- [ ] Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to the local `backend/.env` and run a live Supabase read.
+
+**Learning milestones**
+
+- Repositories keep PostgREST queries out of routes and services.
+- `run_in_threadpool` keeps the synchronous Supabase client from blocking async request handling.
+- Paid invoices and unpaid invoices must be treated differently; outstanding receivables are not cash yet.
+- A currency mismatch fails safely instead of silently adding different currencies together.
+
+### Access-control plan before deployment
+
+The finance endpoints are intentionally available only from `127.0.0.1`, `::1`, and the local TestClient. There is no user authentication yet, so this is a local-development control, not a deployment control. Keep Uvicorn bound to `127.0.0.1` and do not place it behind a same-host reverse proxy while this guard is the only control, because proxied remote requests can appear local. Before any public deployment:
+
+1. Add Supabase Auth or backend sessions and a `business_members` table.
+2. Add RLS policies scoped to `auth.uid()` and the member's business.
+3. Stop using the service-role key for user-scoped reads; enforce business membership in the backend as well.
+4. Add HTTPS, request rate limiting, CSRF protection where applicable, and audit logging.
+5. Configure `FRONTEND_ORIGIN` for the deployed origin and remove the local-only guard only after authentication exists.
+6. Never expose the service-role key to the browser or a `VITE_` variable.
+
+### Phase 4B verification
+
+Run from `backend/`:
+
+```text
+..\.venv\Scripts\python.exe -m ruff check .
+..\.venv\Scripts\python.exe -m ruff format --check .
+..\.venv\Scripts\python.exe -m pytest -q
+```
+
+| Check | Result |
+|---|---|
+| `ruff check .` | Passed |
+| `ruff format --check .` | Passed |
+| `pytest -q` | 73 passed |
+| Supabase client creation without credentials raises a safe error | Passed |
+| Finance endpoint access from a remote host | `403` |
+| Finance endpoint without Supabase credentials | `503` with a safe message |
+| Live Supabase read of the seeded business | Not run; local `backend/.env` has no Supabase credentials |
+| Existing PayPal invoice tests | Still passing |
+
 ## Next steps
 
-- Apply the Phase 4 migrations and seed data to the Supabase project.
-- Add the backend Supabase client, repository layer, and deterministic cash-flow projections.
+- Add Supabase credentials to the local `backend/.env` and run a live cash-flow check against the seeded business.
 - Add the mock AI adapter for drafting reminder text (advisory only).
 - Scaffold the React frontend and its API client using the generated OpenAPI contract.
 - Add the human approval workflow before any reminder-sending feature is implemented.
+- Complete the deployment access-control plan above before exposing the API publicly.

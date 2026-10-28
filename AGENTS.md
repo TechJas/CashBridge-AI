@@ -4,7 +4,7 @@ This file defines how AI coding assistants and team members should work in the C
 
 ## Current state
 
-The repository is in Phase 3. The FastAPI backend exposes a health check and a read-only PayPal Sandbox invoice-history endpoint with a Pydantic response contract, a service layer, and CORS. Dependencies are declared in `backend/requirements.txt`; test and lint dependencies are in `backend/requirements-dev.txt` and installed locally in the gitignored `.venv`. Ruff and pytest are configured in `backend/pyproject.toml`. Local credentials belong in the gitignored `backend/.env`. Supabase, AI providers, and the React frontend are not connected yet.
+The repository is in Phase 4. The FastAPI backend exposes a health check, a read-only PayPal Sandbox invoice-history endpoint, and local-only Supabase business/cash-flow endpoints with Pydantic contracts, repository and service layers, and CORS. Dependencies are declared in `backend/requirements.txt`; test and lint dependencies are in `backend/requirements-dev.txt` and installed locally in the gitignored `.venv`. Ruff and pytest are configured in `backend/pyproject.toml`. Local credentials belong in the gitignored `backend/.env`. Supabase is wired backend-only through the service-role key; the local `backend/.env` still needs the project URL and service-role key before live reads work. The React frontend and AI providers are not connected yet.
 
 Do not assume a command, library, or configuration exists. Verify before using it, and update this file when the project setup changes.
 

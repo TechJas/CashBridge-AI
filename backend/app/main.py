@@ -3,6 +3,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.businesses import router as businesses_router
+from app.api.cash_flow import router as cash_flow_router
 from app.api.invoices import router as invoices_router
 from app.core.config import get_settings
 
@@ -23,6 +25,8 @@ app.add_middleware(
 )
 
 app.include_router(invoices_router, prefix="/api")
+app.include_router(businesses_router, prefix="/api")
+app.include_router(cash_flow_router, prefix="/api")
 
 
 @app.get("/health")
