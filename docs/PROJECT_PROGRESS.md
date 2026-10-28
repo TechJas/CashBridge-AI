@@ -114,7 +114,9 @@ Run from `backend/`:
 | Payer contact data in invoice responses | None; fields are dropped by the schema |
 | OpenAPI schema contains `/api/invoices` and `InvoiceListResponse` | Passed |
 | CORS preflight for the configured frontend origin | Passed |
-| Live PayPal Sandbox request | Not run; requires team Sandbox credentials |
+| Live PayPal Sandbox request | Passed; 4 invoices returned and due dates mapped from `detail.payment_term.due_date` |
+
+PayPal's list response returns `items` and `links` only for this Sandbox account, so `total_items` and `total_pages` may be `null`. Page size remains bounded by the validated `page` and `page_size` query parameters.
 
 ## Current security posture
 

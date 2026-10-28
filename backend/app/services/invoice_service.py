@@ -57,6 +57,10 @@ class InvoiceService:
         if not isinstance(due_amount, dict):
             due_amount = {}
 
+        payment_term = detail.get("payment_term")
+        if not isinstance(payment_term, dict):
+            payment_term = {}
+
         currency_code = (
             amount.get("currency_code")
             or detail.get("currency_code")
@@ -70,7 +74,9 @@ class InvoiceService:
             status=self._optional_str(item.get("status")),
             invoice_number=self._optional_str(detail.get("invoice_number")),
             invoice_date=self._optional_str(detail.get("invoice_date")),
-            due_date=self._optional_str(detail.get("due_date")),
+            due_date=self._optional_str(
+                detail.get("due_date") or payment_term.get("due_date")
+            ),
             currency_code=currency_code,
             total_minor_units=self._money(amount.get("value"), currency_code),
             amount_due_minor_units=self._money(due_amount.get("value"), currency_code),

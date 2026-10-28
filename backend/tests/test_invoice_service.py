@@ -14,8 +14,8 @@ PAYLOAD = {
             "detail": {
                 "invoice_number": "INV-001",
                 "invoice_date": "2026-09-01",
-                "due_date": "2026-09-30",
                 "currency_code": "USD",
+                "payment_term": {"due_date": "2026-09-30"},
             },
             "amount": {"currency_code": "USD", "value": "125.50"},
             "due_amount": {"currency_code": "USD", "value": "125.50"},
@@ -61,6 +61,7 @@ async def test_payload_is_mapped_to_safe_contract() -> None:
     first = result.invoices[0]
     assert first.id == "INV2-0001"
     assert first.invoice_number == "INV-001"
+    assert first.due_date == "2026-09-30"
     assert first.currency_code == "USD"
     assert first.total_minor_units == 12550
     assert first.amount_due_minor_units == 12550
