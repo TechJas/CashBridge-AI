@@ -2,7 +2,7 @@
 
 CashBridge AI is an AI-assisted cash-flow copilot for small businesses. It helps owners see who owes them money, understand upcoming expenses, spot potential cash shortages, and prepare PayPal payment reminders that always require human approval.
 
-> **Status:** Phase 3 - PayPal Sandbox invoice history. The FastAPI backend exposes `/health` and a read-only `/api/invoices` endpoint with Pydantic response contracts, a service layer, CORS, and automated pytest and Ruff checks. Supabase, AI providers, and the React frontend are not connected yet.
+> **Status:** Phase 4 in progress - Supabase schema and cash-flow foundation. The FastAPI backend exposes `/health` and a read-only `/api/invoices` endpoint with Pydantic response contracts, a service layer, CORS, and automated pytest and Ruff checks. The Supabase core schema, RLS, and fictional seed data are written in `supabase/` and still need to be applied to the team project. AI providers and the React frontend are not connected yet.
 
 ## The problem
 
@@ -152,8 +152,8 @@ The test suite mocks PayPal with `httpx.MockTransport`, so it needs no Sandbox c
 |---|---|
 | 1 | Project initialization and repository guardrails |
 | 2 | Local environment and collaboration setup |
-| 3 | FastAPI backend and PayPal Sandbox invoice history (current) |
-| 4 | Supabase schema, cash-flow logic, and AI adapter |
+| 3 | FastAPI backend and PayPal Sandbox invoice history |
+| 4 | Supabase schema, cash-flow logic, and AI adapter (in progress) |
 | 5 | Approval workflow, React frontend, demo data, and presentation |
 
 ## Documentation

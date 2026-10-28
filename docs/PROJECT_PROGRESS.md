@@ -1,7 +1,7 @@
 # CashBridge AI - Project Progress
 
 Last updated: 2026-10-28  
-Current phase: Phase 3 - PayPal Sandbox invoice history
+Current phase: Phase 4 - Supabase schema and cash-flow foundation
 
 ## Phase 1 - Project initialization
 
@@ -129,10 +129,41 @@ PayPal's list response returns `items` and `links` only for this Sandbox account
 - The integration performs read-only invoice retrieval.
 - Supabase, AI providers, authentication, and the React frontend are not connected yet.
 
+## Phase 4 - Supabase schema and cash-flow foundation
+
+### Step 1 - Core schema, RLS, and seed data
+
+- [x] Decided on backend-only Supabase access with the service-role key; the browser will not call Supabase directly.
+- [x] Decided on a single seeded demo business with `business_id` retained for future multi-tenancy.
+- [x] Added `supabase/migrations/20261028000100_create_core_schema.sql`.
+- [x] Added `businesses`, `customers`, `invoices`, `expenses`, `reminders`, `reminder_approvals`, and `reminder_send_attempts`.
+- [x] Stored money as `bigint` integer minor units with ISO 4217 currency codes.
+- [x] Added `updated_at` triggers for mutable tables.
+- [x] Made approval and send-attempt records append-only with database triggers.
+- [x] Added `supabase/migrations/20261028000200_enable_rls.sql`; RLS is enabled on every table and only the backend service role can access data.
+- [x] Added entirely fictional seed data in `supabase/seed.sql` for one business, three customers, six invoices, five expenses, and two reminders.
+- [ ] Apply both migrations and the seed to the team Supabase project through the SQL Editor.
+- [ ] Add the backend repository layer and deterministic cash-flow service.
+
+**Learning milestones**
+
+- Backend-only Supabase access keeps the browser away from the database and the service-role key.
+- Enabling RLS with no policies denies the anon and authenticated roles while the service role bypasses RLS.
+- Append-only tables protect approval and send history from edits after the fact.
+- Integer minor units plus ISO currency codes keep money exact across the database and API.
+
+### How to apply (Supabase SQL Editor)
+
+1. Open the project's SQL Editor.
+2. Run `supabase/migrations/20261028000100_create_core_schema.sql`.
+3. Run `supabase/migrations/20261028000200_enable_rls.sql`.
+4. Run `supabase/seed.sql`.
+5. Confirm with `select count(*) from public.businesses;` (expected `1`) and `select count(*) from public.invoices;` (expected `6`).
+
 ## Next steps
 
-- Add team-owned PayPal Sandbox credentials to `backend/.env` and perform a live invoice-history check.
-- Cache PayPal access tokens and add retry/backoff for `429` and transient upstream errors.
-- Design the Supabase schema and Row Level Security policies.
+- Apply the Phase 4 migrations and seed data to the Supabase project.
+- Add the backend Supabase client, repository layer, and deterministic cash-flow projections.
+- Add the mock AI adapter for drafting reminder text (advisory only).
 - Scaffold the React frontend and its API client using the generated OpenAPI contract.
 - Add the human approval workflow before any reminder-sending feature is implemented.
