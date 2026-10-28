@@ -2,7 +2,7 @@
 
 CashBridge AI is an AI-assisted cash-flow copilot for small businesses. It helps owners see who owes them money, understand upcoming expenses, spot potential cash shortages, and prepare PayPal payment reminders that always require human approval.
 
-> **Status:** Phase 4 in progress - Supabase schema and cash-flow foundation. The FastAPI backend exposes `/health` and a read-only `/api/invoices` endpoint with Pydantic response contracts, a service layer, CORS, and automated pytest and Ruff checks. The Supabase core schema, RLS, and fictional seed data are written in `supabase/` and still need to be applied to the team project. AI providers and the React frontend are not connected yet.
+> **Status:** Phase 4B in progress - Supabase backend integration and cash-flow summary. The FastAPI backend exposes `/health`, the read-only PayPal `/api/invoices` endpoint, and local-only Supabase finance endpoints with Pydantic contracts, a repository/service layer, CORS, and automated pytest and Ruff checks. The Supabase schema, RLS, and fictional seed data are applied. AI providers and the React frontend are not connected yet.
 
 ## The problem
 
@@ -115,6 +115,15 @@ Run these from `backend`:
 ```
 
 The test suite mocks PayPal with `httpx.MockTransport`, so it needs no Sandbox credentials.
+
+### Local-only finance endpoints
+
+These routes are available only from `127.0.0.1`, `::1`, and the local TestClient until authentication exists:
+
+- `GET /api/businesses`
+- `GET /api/cash-flow/summary?business_id=<uuid>&as_of=<YYYY-MM-DD>`
+
+Both require `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `backend/.env`; the service-role key must never reach the browser.
 
 ## Security and safety rules
 
