@@ -4,7 +4,7 @@ This file defines how AI coding assistants and team members should work in the C
 
 ## Current state
 
-The repository is in Phase 1. Only documentation and environment templates exist. There are no package manifests, application entry points, tests, or installed dependencies yet.
+The repository is in Phase 3. The FastAPI backend exposes a health check and a read-only PayPal Sandbox invoice-history endpoint with a Pydantic response contract, a service layer, and CORS. Dependencies are declared in `backend/requirements.txt`; test and lint dependencies are in `backend/requirements-dev.txt` and installed locally in the gitignored `.venv`. Ruff and pytest are configured in `backend/pyproject.toml`. Local credentials belong in the gitignored `backend/.env`. Supabase, AI providers, and the React frontend are not connected yet.
 
 Do not assume a command, library, or configuration exists. Verify before using it, and update this file when the project setup changes.
 
@@ -47,7 +47,7 @@ A route should not contain SQL, PayPal calls, or forecasting logic. A service sh
 - Use ISO dates for due dates and ISO 4217 currency codes for money.
 - Use integer minor units for amounts in the database and API.
 - Add unit tests for cash-flow and approval logic; add integration tests for API behavior.
-- Use Ruff for formatting and linting once the backend is scaffolded.
+- Use Ruff for formatting and linting.
 
 ## Frontend conventions
 
@@ -98,16 +98,27 @@ A route should not contain SQL, PayPal calls, or forecasting logic. A service sh
 - In the pull request, state what changed, how it was tested, and any security impact.
 - Do not commit generated build output, dependencies, coverage reports, or local environment files.
 
-## Planned verification commands
-
-These commands will become available in Phase 2. Update this section when the project is scaffolded.
+## Verification commands
 
 ```text
-Backend:  uv run ruff check .
-          uv run pytest
-Frontend: npm run lint
-          npm run typecheck
+Backend setup (from the repository root):
+  .venv\Scripts\python.exe -m pip install -r backend/requirements-dev.txt
+
+Backend checks (from backend/):
+  ..\.venv\Scripts\python.exe -m ruff check .
+  ..\.venv\Scripts\python.exe -m ruff format --check .
+  ..\.venv\Scripts\python.exe -m pytest
+
+Backend server (from backend/):
+  ..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+
+Health:   Invoke-RestMethod http://127.0.0.1:8000/health
+Invoices: Invoke-RestMethod "http://127.0.0.1:8000/api/invoices?page=1&page_size=10"
+
+Frontend (planned): npm run lint; npm run typecheck
 ```
+
+The backend test suite mocks PayPal with `httpx.MockTransport`, so it does not require Sandbox credentials. A live Sandbox check still requires team-owned credentials in `backend/.env`.
 
 ## Definition of done
 
